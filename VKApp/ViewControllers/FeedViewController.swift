@@ -22,9 +22,23 @@ final class FeedViewController: UIViewController, UITableViewDelegate, UITableVi
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.animatedView.isHidden = false
-        loadingDotes()
-        fetchFeedsByJSON()
+
+//        self.animatedView.isHidden = false
+//        loadingDotes()
+//        fetchFeedsByJSON()
+        replaceWithNewFeedVC()
+    }
+
+    private func replaceWithNewFeedVC() {
+        let newFeedVC = NewsFeedViewController()
+        addChild(newFeedVC)
+        view.addSubview(newFeedVC.view)
+        newFeedVC.didMove(toParent: self)
+        newFeedVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        newFeedVC.view.topAnchor.constraint(equalTo: tableView.topAnchor).isActive = true
+        newFeedVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        newFeedVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        self.animatedView.isHidden = true
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

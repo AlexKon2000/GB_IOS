@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="ZgU-dq-ygR">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="ZgU-dq-ygR">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -450,7 +450,7 @@
                                                     <rect key="frame" x="16" y="538" width="382" height="32"/>
                                                     <subviews>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8FK-MX-ooA">
-                                                            <rect key="frame" x="0.0" y="0.0" width="57" height="32"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="58" height="32"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="hUH-dZ-SEN"/>
                                                             </constraints>
@@ -464,7 +464,7 @@
                                                             </connections>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="egB-gG-FrD">
-                                                            <rect key="frame" x="78" y="0.0" width="55" height="32"/>
+                                                            <rect key="frame" x="79" y="0.0" width="55" height="32"/>
                                                             <color key="tintColor" name="AccentColor"/>
                                                             <state key="normal" title="Button"/>
                                                             <buttonConfiguration key="configuration" style="plain" title="0" imagePadding="4">
@@ -472,7 +472,7 @@
                                                             </buttonConfiguration>
                                                         </button>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kdh-yK-5TZ">
-                                                            <rect key="frame" x="154" y="0.0" width="29" height="32"/>
+                                                            <rect key="frame" x="155" y="0.0" width="28" height="32"/>
                                                             <state key="normal" title="Button"/>
                                                             <buttonConfiguration key="configuration" style="plain" imagePadding="4">
                                                                 <imageReference key="image" image="arrowshape.turn.up.forward" catalog="system" symbolScale="default"/>
