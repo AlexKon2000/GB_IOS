@@ -42,11 +42,11 @@ final class NewsFeedViewController: UIViewController {
 
         tableView.separatorStyle = .none
 
-        tableView.register(HeaderTableViewCell.self, forCellReuseIdentifier: HeaderTableViewCell.reuseID)
-        tableView.register(PostTableViewCell.self, forCellReuseIdentifier: PostTableViewCell.reuseID)
-        tableView.register(PhotoTableViewCell.self, forCellReuseIdentifier: PhotoTableViewCell.reuseID)
-        tableView.register(FooterTableViewCell.self, forCellReuseIdentifier: FooterTableViewCell.reuseID)
-        tableView.register(SeparatorTableViewCell.self, forCellReuseIdentifier: SeparatorTableViewCell.reuseID)
+        tableView.register(registerClass: HeaderTableViewCell.self)
+        tableView.register(registerClass: PostTableViewCell.self)
+        tableView.register(registerClass: PhotoTableViewCell.self)
+        tableView.register(registerClass: FooterTableViewCell.self)
+        tableView.register(registerClass: SeparatorTableViewCell.self)
 
         setupLayouts()
 
@@ -237,7 +237,7 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
 
         switch row {
         case let .header(userName, url, creationDate):
-            let cell = tableView.dequeueReusableCell(withIdentifier: HeaderTableViewCell.reuseID, for: indexPath) as! HeaderTableViewCell
+            let cell: HeaderTableViewCell = tableView.dequeue(forIndexPath: indexPath)
             cell.configure(
                 name: userName,
                 url: url,
@@ -245,15 +245,15 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
             )
             return cell
         case let .post(text):
-            let cell = tableView.dequeueReusableCell(withIdentifier: PostTableViewCell.reuseID, for: indexPath) as! PostTableViewCell
+            let cell: PostTableViewCell = tableView.dequeue(forIndexPath: indexPath)
             cell.configure(with: text)
             return cell
         case let .photo(url):
-            let cell = tableView.dequeueReusableCell(withIdentifier: PhotoTableViewCell.reuseID, for: indexPath) as! PhotoTableViewCell
+            let cell: PhotoTableViewCell = tableView.dequeue(forIndexPath: indexPath)
             cell.configure(with: url)
             return cell
         case let .footer(likes, comments, views):
-            let cell = tableView.dequeueReusableCell(withIdentifier: FooterTableViewCell.reuseID, for: indexPath) as! FooterTableViewCell
+            let cell: FooterTableViewCell = tableView.dequeue(forIndexPath: indexPath)
             cell.configure(
                 likes: likes,
                 comments: comments,
@@ -261,7 +261,8 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
             )
             return cell
         case .separator:
-            return tableView.dequeueReusableCell(withIdentifier: SeparatorTableViewCell.reuseID, for: indexPath) as! SeparatorTableViewCell
+            let cell: SeparatorTableViewCell = tableView.dequeue(forIndexPath: indexPath)
+            return cell
         }
     }
 }
