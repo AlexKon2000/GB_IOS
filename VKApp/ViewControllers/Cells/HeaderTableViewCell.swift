@@ -7,10 +7,9 @@
 
 import UIKit
 import Kingfisher
+import SnapKit
 
 final class HeaderTableViewCell: UITableViewCell {
-    static let reuseID = String(describing: HeaderTableViewCell.self)
-
     private let userPhoto: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -50,22 +49,21 @@ final class HeaderTableViewCell: UITableViewCell {
 
     private func setupLayouts() {
         contentView.addSubview(userPhoto)
-        userPhoto.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8).isActive = true
-        userPhoto.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8).isActive = true
-        userPhoto.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8).isActive = true
-        userPhoto.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
-        userPhoto.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        userPhoto.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        userPhoto.snp.makeConstraints { make in
+            make.leading.top.bottom.equalToSuperview().inset(8)
+            make.centerY.equalToSuperview()
+            make.size.equalTo(40)
+        }
 
         let stackView = UIStackView(arrangedSubviews: [userName, feedCreationDate])
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
 
         contentView.addSubview(stackView)
-        stackView.leadingAnchor.constraint(equalTo: userPhoto.trailingAnchor, constant: 8).isActive = true
-        stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8).isActive = true
-        stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8).isActive = true
+        stackView.snp.makeConstraints { make in
+            make.leading.equalTo(userPhoto.snp.trailing).offset(8)
+            make.top.trailing.bottom.equalToSuperview().inset(8)
+        }
     }
 
     func configure(

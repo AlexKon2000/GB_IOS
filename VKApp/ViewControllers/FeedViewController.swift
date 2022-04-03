@@ -23,9 +23,6 @@ final class FeedViewController: UIViewController, UITableViewDelegate, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
 
-//        self.animatedView.isHidden = false
-//        loadingDotes()
-//        fetchFeedsByJSON()
         replaceWithNewFeedVC()
     }
 
@@ -34,10 +31,10 @@ final class FeedViewController: UIViewController, UITableViewDelegate, UITableVi
         addChild(newFeedVC)
         view.addSubview(newFeedVC.view)
         newFeedVC.didMove(toParent: self)
-        newFeedVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        newFeedVC.view.topAnchor.constraint(equalTo: tableView.topAnchor).isActive = true
-        newFeedVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        newFeedVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        newFeedVC.view.snp.makeConstraints { make in
+            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(tableView)
+        }
         self.animatedView.isHidden = true
     }
     

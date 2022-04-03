@@ -8,8 +8,6 @@
 import UIKit
 
 final class SeparatorTableViewCell: UITableViewCell {
-    static let reuseID = String(describing: SeparatorTableViewCell.self)
-
     private let separator: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -33,10 +31,10 @@ final class SeparatorTableViewCell: UITableViewCell {
         separator.backgroundColor = .systemGray5
 
         contentView.addSubview(separator)
-        separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
-        separator.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        separator.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        separator.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16).isActive = true
-        separator.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        separator.snp.makeConstraints { make in
+            make.height.equalTo(1)
+            make.top.bottom.trailing.equalToSuperview()
+            make.leading.equalToSuperview().inset(16)
+        }
     }
 }
