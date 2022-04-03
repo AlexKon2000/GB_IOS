@@ -52,6 +52,5 @@ final class PhotoTableViewCell: UITableViewCell {
                 print(error.localizedDescription)
             }
         }
-
     }
 }
