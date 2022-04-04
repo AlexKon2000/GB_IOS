@@ -27,7 +27,7 @@ final class FeedViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     private func replaceWithNewFeedVC() {
-        let newFeedVC = NewsFeedViewController()
+        let newFeedVC = NewsFeedViewController(with: .init())
         addChild(newFeedVC)
         view.addSubview(newFeedVC.view)
         newFeedVC.didMove(toParent: self)
