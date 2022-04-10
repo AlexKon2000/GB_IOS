@@ -17,10 +17,10 @@ extension UITableView {
     }
 
     func dequeue<T: UITableViewCell>(forIndexPath indexPath: IndexPath) -> T {
-        return dequeueReusableCell(withIdentifier: String(describing: T.self), for: indexPath) as! T
+        dequeueReusableCell(withIdentifier: String(describing: T.self), for: indexPath) as! T
     }
 
     func dequeue<T: UITableViewHeaderFooterView>() -> T {
-        return dequeueReusableHeaderFooterView(withIdentifier: String(describing: T.self)) as! T
+        dequeueReusableHeaderFooterView(withIdentifier: String(describing: T.self)) as! T
     }
 }

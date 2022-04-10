@@ -8,8 +8,6 @@
 import UIKit
 
 final class FooterTableViewCell: UITableViewCell {
-    static let reuseID = String(describing: FooterTableViewCell.self)
-
     private lazy var likeButton: UIButton = {
         var configuration = UIButton.Configuration.plain()
         configuration.image = UIImage(systemName: "hand.thumbsup.circle")
@@ -79,10 +77,9 @@ final class FooterTableViewCell: UITableViewCell {
         stackView.axis = .horizontal
 
         contentView.addSubview(stackView)
-        stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8).isActive = true
-        stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8).isActive = true
-        stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8).isActive = true
+        stackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(8)
+        }
     }
 
     func configure(

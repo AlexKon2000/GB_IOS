@@ -8,8 +8,6 @@
 import UIKit
 
 final class PostTableViewCell: UITableViewCell {
-    static let reuseID = String(describing: PostTableViewCell.self)
-
     private let postLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
@@ -30,10 +28,9 @@ final class PostTableViewCell: UITableViewCell {
 
     private func setupLayouts() {
         contentView.addSubview(postLabel)
-        postLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8).isActive = true
-        postLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8).isActive = true
-        postLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8).isActive = true
-        postLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8).isActive = true
+        postLabel.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(8)
+        }
     }
 
     func configure(with text: String) {

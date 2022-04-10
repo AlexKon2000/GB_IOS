@@ -29,7 +29,20 @@ final class NewsFeedViewController: UIViewController {
 
     private var feeds = [Feed]()
     private var rows = [[CellType]]()
+    private let model: NewsFeedModel
 
+    // MARK: - Initializers
+
+    init(with model: NewsFeedModel) {
+        self.model = model
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Life cycle
 
     override func viewDidLoad() {
@@ -50,15 +63,15 @@ final class NewsFeedViewController: UIViewController {
 
         setupLayouts()
 
-        fetchFeedsByJSON()
+        model.delegate = self
+        model.load()
     }
 
     private func setupLayouts() {
         view.addSubview(tableView)
-        tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        tableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     private func fillRows() {
@@ -118,107 +131,6 @@ final class NewsFeedViewController: UIViewController {
             rows.append(feedRows)
         }
     }
-
-    private func fetchFeedsByJSON() {
-
-        let feedService = NetworkService<FeedDTO>()
-
-        feedService.path = "/method/newsfeed.get"
-        feedService.queryItems = [
-            URLQueryItem(name: "filters", value: "post"),
-            URLQueryItem(name: "access_token", value: SessionStorage.shared.token),
-            URLQueryItem(name: "v", value: "5.131")
-        ]
-        feedService.fetch { [weak self] feedDTOObjects in
-            switch feedDTOObjects {
-            case .failure(let error):
-                print(error)
-            case .success(let feedsDTO):
-                guard let self = self else { return }
-                self.feeds = feedsDTO.map { feed in
-
-                    let photosURLs = self.loadPhotosFromFeed(feed)
-
-                    if feed.sourceID > 0,
-                       let user = self.loadUserByID(feed.sourceID) {
-                        return Feed(
-                            user: user,
-                            messageText: feed.text,
-                            photos: photosURLs,
-                            date: feed.date,
-                            likesCount: feed.likes.count,
-                            commentsCount: feed.comments.count,
-                            viewsCount: feed.views.count)
-                    } else {
-                        if let group = self.loadGroupByID(feed.sourceID) {
-                            return Feed(
-                                group: group,
-                                messageText: feed.text,
-                                photos: photosURLs,
-                                date: feed.date,
-                                likesCount: feed.likes.count,
-                                commentsCount: feed.comments.count,
-                                viewsCount: feed.views.count)
-                        }
-                    }
-                    return Feed(
-                        user: User(id: 0, firstName: "No", secondName: "username", userPhotoURLString: nil),
-                        messageText: feed.text,
-                        photos: photosURLs,
-                        date: feed.date,
-                        likesCount: feed.likes.count,
-                        commentsCount: feed.comments.count,
-                        viewsCount: feed.views.count
-                    )
-                }
-                self.feeds = self.feeds.filter{ $0.messageText != "" }
-                DispatchQueue.main.async {
-                    self.fillRows()
-                    self.tableView.reloadData()
-                }
-            }
-        }
-    }
-
-    private func loadUserByID(_ id: Int) -> User? {
-        do {
-            let realmUsers: [RealmUser] = try RealmService.load(typeOf: RealmUser.self)
-            if let user = realmUsers.filter({ $0.id == id }).first {
-                return User(
-                    id: user.id,
-                    firstName: user.firstName,
-                    secondName: user.secondName,
-                    userPhotoURLString: user.userPhotoURLString
-                )
-            } else {
-                return nil
-            }
-        } catch {
-            print(error)
-            return nil
-        }
-    }
-
-    private func loadGroupByID(_ id: Int) -> Group? {
-        do {
-            let realmGroups: [RealmGroup] = try RealmService.load(typeOf: RealmGroup.self)
-            if let group = realmGroups.filter({ $0.id == -id }).first {
-                return Group(id: group.id, title: group.title, imageURL: group.groupPhotoURL)
-            } else {
-                return nil
-            }
-        } catch {
-            print(error)
-            return nil
-        }
-    }
-
-    private func loadPhotosFromFeed(_ feed: FeedDTO) -> [Photo]? {
-        guard let images = feed.photosURLs else { return nil }
-        let photos = images.compactMap { $0.photo }
-        let photoSizes = photos.map { $0.photos }
-        return photoSizes.map { Photo(imageURLString: $0.last?.url) }
-    }
 }
 
 // MARK: - UITableViewDataSource, UITableViewDelegate
@@ -264,5 +176,19 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
             let cell: SeparatorTableViewCell = tableView.dequeue(forIndexPath: indexPath)
             return cell
         }
+    }
+}
+
+// MARK: - NewsFeedModelDelegate
+
+extension NewsFeedViewController: NewsFeedModelDelegate {
+    func didLoadModel(feeds: [Feed]) {
+        self.feeds = feeds
+        fillRows()
+        tableView.reloadData()
+    }
+
+    func didFailLoadModel(with error: Error) {
+        print(error.localizedDescription)
     }
 }

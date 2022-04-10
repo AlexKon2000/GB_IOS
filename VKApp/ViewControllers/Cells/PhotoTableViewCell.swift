@@ -7,10 +7,9 @@
 
 import UIKit
 import Kingfisher
+import SnapKit
 
 final class PhotoTableViewCell: UITableViewCell {
-    static let reuseID = String(describing: PhotoTableViewCell.self)
-
     private let photoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -18,7 +17,7 @@ final class PhotoTableViewCell: UITableViewCell {
         return imageView
     }()
 
-    private var heightConstraint: NSLayoutConstraint?
+    private var heightConstraint: Constraint?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -33,13 +32,10 @@ final class PhotoTableViewCell: UITableViewCell {
 
     private func setupLayouts() {
         contentView.addSubview(photoImageView)
-        photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8).isActive = true
-        photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8).isActive = true
-        photoImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8).isActive = true
-        photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8).isActive = true
-        heightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: 0)
-        heightConstraint?.priority = .defaultHigh
-        heightConstraint?.isActive = true
+        photoImageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(8)
+            heightConstraint = make.height.equalTo(0).priority(.high).constraint
+        }
     }
 
     func configure(with url: URL) {
@@ -47,11 +43,11 @@ final class PhotoTableViewCell: UITableViewCell {
             switch result {
             case let .success(imageResult):
                 let ratio = imageResult.image.size.height / imageResult.image.size.width
-                self?.heightConstraint?.constant = (self?.photoImageView.bounds.width ?? 0) * ratio
+                let height = (self?.photoImageView.bounds.width ?? 0) * ratio
+                self?.heightConstraint?.update(offset: height)
             case let .failure(error):
                 print(error.localizedDescription)
             }
         }
-
     }
 }
