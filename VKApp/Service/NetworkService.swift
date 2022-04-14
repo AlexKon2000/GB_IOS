@@ -43,28 +43,4 @@ final class NetworkService<ItemsType: Decodable> {
         }
         task.resume()
     }
-    
-//    func fetchSearched(for searchingText: String) {
-//        self.queryItems.append(URLQueryItem(name: "q", value: searchingText))
-//        fetch< { data in
-//            guard data != nil else { return }
-//        }
-//    }
-//
-//    func fetchDataByField<ResponseType: Decodable>(by field: String, completion: @escaping (ResponseDTO<ResponseType>?) -> Void) {
-//        fetch(completion: { data in
-//            guard
-//                let json = data,
-//                let response = json["response"] as? [String: Any],
-//                let items = response["items"] as? [[String: Any]]
-//            else {
-//                completion(nil)
-//                return
-//            }
-//            let fieldValues = items.compactMap { dict in
-//                dict[field] as? Int
-//            }
-//            completion(fieldValues)
-//        }
-//    })
 }
