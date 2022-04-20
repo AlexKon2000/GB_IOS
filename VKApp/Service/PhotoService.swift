@@ -7,7 +7,41 @@
 
 import UIKit
 
+struct Utils<T> {
+    var target: T
+}
+
+protocol UtilsAvailable {}
+
+extension UtilsAvailable {
+    var ps: Utils<Self> {
+        Utils(target: self)
+    }
+}
+
+extension UIImageView: UtilsAvailable {}
+
+extension Utils where T == UIImageView {
+    func photo(byURL: String) {
+        DispatchQueue.global().async {
+            PhotoService.shared.photo(byUrl: byURL) { image in
+                guard let image = image else {
+                    return
+                }
+
+                DispatchQueue.main.async {
+                    target.image = image
+                }
+            }
+        }
+    }
+}
+
 class PhotoService {
+    static var shared = PhotoService()
+
+    private init() {}
+
     private static let pathName: String = {
         let pathName = "images"
 
@@ -27,16 +61,6 @@ class PhotoService {
     private let cacheLifeTime: TimeInterval = 30 * 24 * 60 * 60
     private var images = [String: UIImage]()
 
-    private let container: DataReloadable
-
-    init(container: UITableView) {
-        self.container = Table(table: container)
-    }
-
-    init(container: UICollectionView) {
-        self.container = Collection(collection: container)
-    }
-
     private func getFilePath(url: String) -> String? {
         guard let cachesDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first else {
             return nil
@@ -49,7 +73,8 @@ class PhotoService {
 
     private func saveImageToCache(url: String, image: UIImage) {
         guard let fileName = getFilePath(url: url),
-              let data = image.pngData() else {
+              let data = image.pngData()
+        else {
             return
         }
         FileManager.default.createFile(atPath: fileName, contents: data, attributes: nil)
@@ -65,39 +90,38 @@ class PhotoService {
         }
 
         let lifeTime = Date().timeIntervalSince(modificationDate)
+
         guard
             lifeTime <= cacheLifeTime,
-            let image = UIImage(contentsOfFile: fileName) else { return nil }
-        DispatchQueue.main.async {
-            self.images[url] = image
+            let image = UIImage(contentsOfFile: fileName)
+        else {
+            return nil
         }
+
+        self.images[url] = image
 
         return image
     }
 
-    private func loadPhoto(atIndexpath indexPath: IndexPath, byUrl urlString: String) {
+    private func loadPhoto(byUrl urlString: String, completion: @escaping (UIImage?) -> Void) {
         guard let url = URL(string: urlString) else {
             return
         }
+
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             guard let data = data, error == nil, let image = UIImage(data: data) else {
                 return
             }
-            DispatchQueue.main.async {
-                self?.images[urlString] = image
-            }
 
+            self?.images[urlString] = image
             self?.saveImageToCache(url: urlString, image: image)
-
-            DispatchQueue.main.async {
-                self?.container.reloadRow(atIndexpath: indexPath)
-            }
-
+            completion(image)
         }
+
         task.resume()
     }
 
-    func photo(atIndexpath indexPath: IndexPath, byUrl url: String) -> UIImage? {
+    func photo(byUrl url: String, completion: @escaping (UIImage?) -> Void) {
         var image: UIImage?
 
         if let photo = images[url] {
@@ -105,39 +129,10 @@ class PhotoService {
         } else if let photo = getImageFromCache(url: url) {
             image = photo
         } else {
-            loadPhoto(atIndexpath: indexPath, byUrl: url)
+            loadPhoto(byUrl: url, completion: completion)
+            return
         }
 
-        return image
-    }
-}
-
-fileprivate protocol DataReloadable {
-    func reloadRow(atIndexpath indexPath: IndexPath)
-}
-
-extension PhotoService {
-    private class Table: DataReloadable {
-        let table: UITableView
-
-        init(table: UITableView) {
-            self.table = table
-        }
-
-        func reloadRow(atIndexpath indexPath: IndexPath) {
-            table.reloadRows(at: [indexPath], with: .none)
-        }
-    }
-
-    private class Collection: DataReloadable {
-        let collection: UICollectionView
-
-        init(collection: UICollectionView) {
-            self.collection = collection
-        }
-
-        func reloadRow(atIndexpath indexPath: IndexPath) {
-            collection.reloadItems(at: [indexPath])
-        }
+        completion(image)
     }
 }
