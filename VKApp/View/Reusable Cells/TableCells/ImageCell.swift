@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Kingfisher
 
 class ImageCell: UITableViewCell {
 
@@ -14,7 +13,7 @@ class ImageCell: UITableViewCell {
     @IBOutlet var photo: UIImageView!
     @IBOutlet weak var abbreviationLabel: UILabel!
     @IBOutlet weak var userPicView: UIView!
-    
+
     func configureCell(label: String, additionalLabel: String?, pictureURL: String?, color: CGColor?) {
         
         // имя или название
@@ -38,8 +37,7 @@ class ImageCell: UITableViewCell {
         // фотка
         photo.isHidden = pictureURL == nil
         if let imageURL = picture {
-            let url = URL(string: imageURL)
-            photo.kf.setImage(with: url, options: [.transition(.fade(0.2))])
+            photo.ps.photo(byURL: imageURL)
         } else {
             photo.image = nil
         }
