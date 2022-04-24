@@ -159,6 +159,7 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
         case let .post(text):
             let cell: PostTableViewCell = tableView.dequeue(forIndexPath: indexPath)
             cell.configure(with: text)
+            cell.delegate = self
             return cell
         case let .photo(url):
             let cell: PhotoTableViewCell = tableView.dequeue(forIndexPath: indexPath)
@@ -190,5 +191,11 @@ extension NewsFeedViewController: NewsFeedModelDelegate {
 
     func didFailLoadModel(with error: Error) {
         print(error.localizedDescription)
+    }
+}
+
+extension NewsFeedViewController: PostExtendable {
+    func reload() {
+        tableView.performBatchUpdates(nil, completion: nil)
     }
 }
