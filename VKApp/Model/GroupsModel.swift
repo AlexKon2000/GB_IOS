@@ -57,7 +57,7 @@ final class GroupsModel {
         ]
 
         return Promise<[GroupDTO]> { seal in
-            groupsService.fetch { result in
+            groupsService.fetch { result, _ in
                 switch result {
                 case .failure(let error):
                     seal.reject(error)

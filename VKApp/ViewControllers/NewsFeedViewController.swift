@@ -55,6 +55,7 @@ final class NewsFeedViewController: UIViewController {
 
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.prefetchDataSource = self
 
         tableView.separatorStyle = .none
 
@@ -86,11 +87,11 @@ final class NewsFeedViewController: UIViewController {
 
     @objc private func refreshData() {
         tableView.refreshControl?.beginRefreshing()
-        model.load()
+        model.invalidate()
     }
     
-    private func fillRows() {
-        for feed in feeds {
+    private func fillRows(from: [Feed]) {
+        for feed in from {
             var feedRows = [CellType]()
 
             var userName: String {
@@ -196,13 +197,32 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+extension NewsFeedViewController: UITableViewDataSourcePrefetching {
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        guard let maxSection = indexPaths.map({ $0.section }).max() else {
+            return
+        }
+
+        if maxSection > feeds.count - 3, !model.isLoading {
+            model.load()
+        }
+    }
+}
+
 // MARK: - NewsFeedModelDelegate
 
 extension NewsFeedViewController: NewsFeedModelDelegate {
+    func didLoadMoreModel(feeds: [Feed]) {
+        let indexSet = IndexSet(integersIn: self.feeds.count ..< self.feeds.count + feeds.count)
+        self.feeds.append(contentsOf: feeds)
+        fillRows(from: feeds)
+        self.tableView.insertSections(indexSet, with: .automatic)
+    }
+
     func didLoadModel(feeds: [Feed]) {
         tableView.refreshControl?.endRefreshing()
         self.feeds = feeds
-        fillRows()
+        fillRows(from: feeds)
         tableView.reloadData()
     }
 
