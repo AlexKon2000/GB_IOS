@@ -49,6 +49,8 @@ final class NewsFeedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupRefreshControl()
+
         view.translatesAutoresizingMaskIntoConstraints = false
 
         tableView.dataSource = self
@@ -73,6 +75,18 @@ final class NewsFeedViewController: UIViewController {
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+
+    private func setupRefreshControl() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = Theme.secondaryTextColor
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+    }
+
+    @objc private func refreshData() {
+        tableView.refreshControl?.beginRefreshing()
+        model.load()
     }
     
     private func fillRows() {
@@ -186,6 +200,7 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
 
 extension NewsFeedViewController: NewsFeedModelDelegate {
     func didLoadModel(feeds: [Feed]) {
+        tableView.refreshControl?.endRefreshing()
         self.feeds = feeds
         fillRows()
         tableView.reloadData()
