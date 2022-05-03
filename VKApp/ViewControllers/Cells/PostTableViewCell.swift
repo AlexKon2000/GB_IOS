@@ -6,9 +6,10 @@
 //
 
 import UIKit
+import SnapKit
 
 protocol PostExtendable: AnyObject {
-    func reload()
+    func reload(indexPath: IndexPath)
 }
 
 final class PostTableViewCell: UITableViewCell {
@@ -16,8 +17,7 @@ final class PostTableViewCell: UITableViewCell {
 
     private let postLabel: UILabel = {
         let label = UILabel()
-        label.numberOfLines = 1
-        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = Constants.initialNumberOfLines
         return label
     }()
 
@@ -30,10 +30,13 @@ final class PostTableViewCell: UITableViewCell {
         return button
     }()
 
-    private var isExpanded = false {
+    private var indexPath: IndexPath?
+
+    var isExpanded = false {
         didSet {
             let title = isExpanded ? "меньше" : "больше"
             showButton.setTitle(title, for: .normal)
+            postLabel.numberOfLines = isExpanded ? 0 : Constants.initialNumberOfLines
         }
     }
 
@@ -48,32 +51,39 @@ final class PostTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func prepareForReuse() {
-        super.prepareForReuse()
+    override func layoutSubviews() {
+        super.layoutSubviews()
 
-        isExpanded = false
+        showButton.isHidden = postLabel.maxNumberOfLines <= Constants.initialNumberOfLines
     }
 
     private func setupLayouts() {
         contentView.addSubview(postLabel)
         postLabel.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview().inset(8)
+            make.top.trailing.leading.equalToSuperview().inset(8)
         }
 
         contentView.addSubview(showButton)
         showButton.snp.makeConstraints { make in
             make.top.equalTo(postLabel.snp.bottom)
-            make.leading.bottom.equalToSuperview().inset(4)
+            make.leading.bottom.equalToSuperview().inset(8)
         }
     }
 
-    func configure(with text: String) {
+    func configure(with text: String, indexPath: IndexPath) {
         postLabel.text = text
+        self.indexPath = indexPath
     }
 
-    private func showButtonTapped() {
-        isExpanded = !isExpanded
-        postLabel.numberOfLines = isExpanded ? 0 : 1
-        delegate?.reload()
+    @objc private func showButtonTapped() {
+        guard let indexPath = indexPath else {
+            return
+        }
+
+        delegate?.reload(indexPath: indexPath)
     }
+}
+
+private enum Constants {
+    static let initialNumberOfLines = 2
 }

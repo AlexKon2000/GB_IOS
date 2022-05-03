@@ -30,6 +30,7 @@ final class NewsFeedViewController: UIViewController {
     private var feeds = [Feed]()
     private var rows = [[CellType]]()
     private let model: NewsFeedModel
+    private var indexes = [IndexPath: Bool]()
 
     // MARK: - Initializers
 
@@ -158,7 +159,8 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         case let .post(text):
             let cell: PostTableViewCell = tableView.dequeue(forIndexPath: indexPath)
-            cell.configure(with: text)
+            cell.configure(with: text, indexPath: indexPath)
+            cell.isExpanded = indexes[indexPath] ?? false
             cell.delegate = self
             return cell
         case let .photo(url):
@@ -194,8 +196,12 @@ extension NewsFeedViewController: NewsFeedModelDelegate {
     }
 }
 
+// MARK: - PostExtendable
+
 extension NewsFeedViewController: PostExtendable {
-    func reload() {
-        tableView.performBatchUpdates(nil, completion: nil)
+    func reload(indexPath: IndexPath) {
+        let isExpanded = indexes[indexPath] ?? false
+        indexes[indexPath] = !isExpanded
+        tableView.reloadRows(at: [indexPath], with: .fade)
     }
 }
