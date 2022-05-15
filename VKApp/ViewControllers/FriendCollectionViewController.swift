@@ -28,7 +28,7 @@ class FriendCollectionViewController: UICollectionViewController {
             URLQueryItem(name: "access_token", value: SessionStorage.shared.token),
             URLQueryItem(name: "v", value: "5.131")
         ]
-        photosService.fetch { [weak self] photosDTOObject in
+        photosService.fetch { [weak self] photosDTOObject, _ in
             switch photosDTOObject {
             case .failure(let error):
                 print(error)

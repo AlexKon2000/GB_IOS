@@ -22,7 +22,7 @@ extension AllGroupTableViewController: UISearchBarDelegate {
             URLQueryItem(name: "v", value: "5.131")
         ]
         
-        searchGroupsService.fetch { groupsDTOObject in
+        searchGroupsService.fetch { groupsDTOObject, _ in
             switch groupsDTOObject {
             case .failure(let error):
                 print(error)

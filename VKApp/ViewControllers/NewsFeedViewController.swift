@@ -30,6 +30,7 @@ final class NewsFeedViewController: UIViewController {
     private var feeds = [Feed]()
     private var rows = [[CellType]]()
     private let model: NewsFeedModel
+    private var indexes = [IndexPath: Bool]()
 
     // MARK: - Initializers
 
@@ -48,10 +49,13 @@ final class NewsFeedViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        setupRefreshControl()
+
         view.translatesAutoresizingMaskIntoConstraints = false
 
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.prefetchDataSource = self
 
         tableView.separatorStyle = .none
 
@@ -73,9 +77,21 @@ final class NewsFeedViewController: UIViewController {
             make.edges.equalToSuperview()
         }
     }
+
+    private func setupRefreshControl() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = Theme.secondaryTextColor
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+    }
+
+    @objc private func refreshData() {
+        tableView.refreshControl?.beginRefreshing()
+        model.invalidate()
+    }
     
-    private func fillRows() {
-        for feed in feeds {
+    private func fillRows(from: [Feed]) {
+        for feed in from {
             var feedRows = [CellType]()
 
             var userName: String {
@@ -158,7 +174,9 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
             return cell
         case let .post(text):
             let cell: PostTableViewCell = tableView.dequeue(forIndexPath: indexPath)
-            cell.configure(with: text)
+            cell.configure(with: text, indexPath: indexPath)
+            cell.isExpanded = indexes[indexPath] ?? false
+            cell.delegate = self
             return cell
         case let .photo(url):
             let cell: PhotoTableViewCell = tableView.dequeue(forIndexPath: indexPath)
@@ -179,16 +197,46 @@ extension NewsFeedViewController: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+extension NewsFeedViewController: UITableViewDataSourcePrefetching {
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        guard let maxSection = indexPaths.map({ $0.section }).max() else {
+            return
+        }
+
+        if maxSection > feeds.count - 3, !model.isLoading {
+            model.load()
+        }
+    }
+}
+
 // MARK: - NewsFeedModelDelegate
 
 extension NewsFeedViewController: NewsFeedModelDelegate {
+    func didLoadMoreModel(feeds: [Feed]) {
+        let indexSet = IndexSet(integersIn: self.feeds.count ..< self.feeds.count + feeds.count)
+        self.feeds.append(contentsOf: feeds)
+        fillRows(from: feeds)
+        self.tableView.insertSections(indexSet, with: .automatic)
+    }
+
     func didLoadModel(feeds: [Feed]) {
+        tableView.refreshControl?.endRefreshing()
         self.feeds = feeds
-        fillRows()
+        fillRows(from: feeds)
         tableView.reloadData()
     }
 
     func didFailLoadModel(with error: Error) {
         print(error.localizedDescription)
+    }
+}
+
+// MARK: - PostExtendable
+
+extension NewsFeedViewController: PostExtendable {
+    func reload(indexPath: IndexPath) {
+        let isExpanded = indexes[indexPath] ?? false
+        indexes[indexPath] = !isExpanded
+        tableView.reloadRows(at: [indexPath], with: .fade)
     }
 }

@@ -32,7 +32,7 @@ final class SeparatorTableViewCell: UITableViewCell {
 
         contentView.addSubview(separator)
         separator.snp.makeConstraints { make in
-            make.height.equalTo(1)
+            make.height.equalTo(1).priority(.high)
             make.top.bottom.trailing.equalToSuperview()
             make.leading.equalToSuperview().inset(16)
         }

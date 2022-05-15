@@ -20,7 +20,7 @@ final class GetDataOperation: AsyncOperation {
             URLQueryItem(name: "access_token", value: SessionStorage.shared.token),
             URLQueryItem(name: "v", value: "5.131")
         ]
-        friendsService.fetch { [weak self] friendsDTOObjects in
+        friendsService.fetch { [weak self] friendsDTOObjects, _ in
             switch friendsDTOObjects {
             case .failure(let error):
                 print(error)

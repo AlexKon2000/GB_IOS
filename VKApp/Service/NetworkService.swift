@@ -17,7 +17,7 @@ final class NetworkService<ItemsType: Decodable> {
     var queryItems = [URLQueryItem]()
     
     // MARK: - Public methods
-    func fetch(completion: @escaping (Result<[ItemsType], Error>) -> Void) {
+    func fetch(completion: @escaping (Result<[ItemsType], Error>, String?) -> Void) {
         var urlComponents: URLComponents {
             var components = URLComponents()
             components.scheme = scheme
@@ -35,10 +35,10 @@ final class NetworkService<ItemsType: Decodable> {
             else { return }
             do{
                 let json = try JSONDecoder().decode(ResponseDTO<ItemsType>.self, from: data)
-                completion(.success(json.response.items))
+                completion(.success(json.response.items), json.response.nextFrom)
             } catch {
                 print(error)
-                completion(.failure(error))
+                completion(.failure(error), nil)
             }
         }
         task.resume()

@@ -82,7 +82,7 @@ final class FeedViewController: UIViewController, UITableViewDelegate, UITableVi
             URLQueryItem(name: "access_token", value: SessionStorage.shared.token),
             URLQueryItem(name: "v", value: "5.131")
         ]
-        feedService.fetch { [weak self] feedDTOObjects in
+        feedService.fetch { [weak self] feedDTOObjects, _ in
             switch feedDTOObjects {
             case .failure(let error):
                 print(error)

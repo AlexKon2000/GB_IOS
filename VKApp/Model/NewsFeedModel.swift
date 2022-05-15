@@ -9,16 +9,27 @@ import Foundation
 
 protocol NewsFeedModelDelegate: AnyObject {
     func didLoadModel(feeds: [Feed])
+    func didLoadMoreModel(feeds: [Feed])
     func didFailLoadModel(with error: Error)
 }
 
 final class NewsFeedModel {
     weak var delegate: NewsFeedModelDelegate?
 
+    private var nextFrom = ""
+
+    var isLoading = false
+
     func load() {
+        isLoading = true
         DispatchQueue.global().async {
             self.fetchData()
         }
+    }
+
+    func invalidate() {
+        nextFrom = ""
+        load()
     }
 
     private func fetchData() {
@@ -28,10 +39,15 @@ final class NewsFeedModel {
         feedService.queryItems = [
             URLQueryItem(name: "filters", value: "post"),
             URLQueryItem(name: "access_token", value: SessionStorage.shared.token),
-            URLQueryItem(name: "v", value: "5.131")
+            URLQueryItem(name: "v", value: "5.131"),
+            URLQueryItem(name: "count", value: "20")
         ]
 
-        feedService.fetch { [weak self] result in
+        if !nextFrom.isEmpty {
+            feedService.queryItems.append(URLQueryItem(name: "start_from", value: nextFrom))
+        }
+
+        feedService.fetch { [weak self] result, nextFrom in
             switch result {
             case .failure(let error):
                 self?.delegate?.didFailLoadModel(with: error)
@@ -84,8 +100,17 @@ final class NewsFeedModel {
                 }
 
                 let filtered = feeds.filter { $0.messageText != "" }
+                self.isLoading = false
                 DispatchQueue.main.async {
-                    self.delegate?.didLoadModel(feeds: filtered)
+                    if self.nextFrom.isEmpty {
+                        self.delegate?.didLoadModel(feeds: filtered)
+                    } else {
+                        self.delegate?.didLoadMoreModel(feeds: filtered)
+                    }
+                    
+                    if let nextFrom = nextFrom {
+                        self.nextFrom = nextFrom
+                    }
                 }
             }
         }
