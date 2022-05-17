@@ -41,6 +41,7 @@ final class FooterTableViewCell: UITableViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = Theme.secondaryTextColor
+        label.backgroundColor = Theme.backgroundColor
         return label
     }()
 

@@ -24,6 +24,7 @@ final class HeaderTableViewCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.setContentHuggingPriority(.defaultLow, for: .vertical)
         label.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        label.backgroundColor = Theme.backgroundColor
         return label
     }()
 
@@ -33,6 +34,7 @@ final class HeaderTableViewCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.setContentHuggingPriority(.defaultHigh, for: .vertical)
         label.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        label.backgroundColor = Theme.backgroundColor
         return label
     }()
 

@@ -18,6 +18,7 @@ final class PostTableViewCell: UITableViewCell {
     private let postLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = Constants.initialNumberOfLines
+        label.backgroundColor = Theme.backgroundColor
         return label
     }()
 
