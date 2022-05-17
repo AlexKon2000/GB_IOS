@@ -10,4 +10,5 @@ import UIKit
 struct Theme {
     static let mainTextColor = UIColor(named: "mainText")!
     static let secondaryTextColor = UIColor(named: "secondaryText")!
+    static let backgroundColor: UIColor = .white
 }
